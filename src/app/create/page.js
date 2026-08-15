@@ -62,7 +62,7 @@ export default function CreateReport() {
         // メール通知 (FormSubmit.co) をフロント側から実行する（Refererヘッダーが必要なため）
         try {
           const workingHoursText = validWorkingHours.map(h => `${h.start}〜${h.end}`).join(', ');
-          await fetch('https://formsubmit.co/ajax/fugfuurgh57@yahoo.co.jp', {
+          await fetch('https://formsubmit.co/ajax/fugfuurgh57@yahoo.co.jp,igarasimiyagi@yahoo.co.jp', {
             method: "POST",
             headers: { 
                 'Content-Type': 'application/json',
