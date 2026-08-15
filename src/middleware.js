@@ -4,12 +4,26 @@ export function middleware(req) {
   const basicAuth = req.headers.get('authorization');
   const url = req.nextUrl;
 
+  const isAdminRoute = url.pathname.startsWith('/admin') || url.pathname.startsWith('/api/export');
+
   if (basicAuth) {
     const authValue = basicAuth.split(' ')[1];
     const [user, pwd] = atob(authValue).split(':');
 
-    if (user === '1126' && pwd === '1126') {
-      return NextResponse.next();
+    if (isAdminRoute) {
+      // 管理者用パスワード
+      if (user === 'admin' && pwd === 'admin') {
+        return NextResponse.next();
+      }
+    } else {
+      // 作業員用パスワード
+      if (user === '1126' && pwd === '1126') {
+        return NextResponse.next();
+      }
+      // 管理者権限でも通常画面を見れるようにする
+      if (user === 'admin' && pwd === 'admin') {
+        return NextResponse.next();
+      }
     }
   }
   
@@ -24,6 +38,5 @@ export function middleware(req) {
 }
 
 export const config = {
-  // すべてのページ（APIと静的ファイルを除く）に適用
   matcher: ['/((?!api/auth|_next/static|_next/image|favicon.ico).*)'],
 };

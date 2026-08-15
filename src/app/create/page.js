@@ -93,8 +93,8 @@ export default function CreateReport() {
           alert('日報は保存されましたが、メール通知システムでエラーが発生しました: ' + e.message);
         }
         
-        router.push('/');
-        router.refresh();
+        alert('日報の送信が完了しました！お疲れ様でした。');
+        window.location.reload(); // フォームをリセットする
       } else {
         const errorData = await res.json();
         alert('エラーが発生しました: ' + errorData.error);
@@ -110,7 +110,6 @@ export default function CreateReport() {
     <div className="container form-container">
       <header className="header">
         <h1>日報作成</h1>
-        <Link href="/" className="btn btn-secondary">戻る</Link>
       </header>
 
       <main>
