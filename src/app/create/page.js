@@ -59,6 +59,29 @@ export default function CreateReport() {
       });
       
       if (res.ok) {
+        // メール通知 (FormSubmit.co) をフロント側から実行する（Refererヘッダーが必要なため）
+        try {
+          const workingHoursText = validWorkingHours.map(h => `${h.start}〜${h.end}`).join(', ');
+          await fetch('https://formsubmit.co/ajax/fugfuurgh57@yahoo.co.jp', {
+            method: "POST",
+            headers: { 
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({
+                _subject: `【日報提出】${formData.name}さんから日報が提出されました`,
+                '日付': formData.date,
+                '氏名': formData.name,
+                '稼働時間': workingHoursText,
+                '施工場所': formData.location,
+                '業務内容': formData.content,
+                '備考': formData.remarks || 'なし',
+            })
+          });
+        } catch (e) {
+          console.error('Mail error', e);
+        }
+        
         router.push('/');
         router.refresh();
       } else {
