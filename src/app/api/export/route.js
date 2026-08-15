@@ -49,7 +49,40 @@ export async function GET(request) {
     });
 
     // データの追加とスタイルの適用
+    let currentMonth = '';
+
     rows.forEach((row) => {
+      // 月が変わった時に区切り行を挿入
+      const rowMonth = row.date.substring(0, 7); // 例: 2026-08
+      
+      if (rowMonth !== currentMonth) {
+        currentMonth = rowMonth;
+        
+        const [yyyy, mm] = currentMonth.split('-');
+        const monthLabel = `【${yyyy}年${parseInt(mm, 10)}月】`;
+        
+        const separatorRow = sheet.addRow([monthLabel, '', '', '', '', '']);
+        
+        // セルの結合 (A列からF列まで)
+        sheet.mergeCells(`A${separatorRow.number}:F${separatorRow.number}`);
+        
+        // 区切り行のスタイル設定
+        const cell = sheet.getCell(`A${separatorRow.number}`);
+        cell.fill = {
+          type: 'pattern',
+          pattern: 'solid',
+          fgColor: { argb: 'FFFFF2CC' } // 薄い黄色
+        };
+        cell.font = { bold: true, size: 12, color: { argb: 'FF000000' } };
+        cell.alignment = { horizontal: 'center', vertical: 'middle' };
+        cell.border = {
+          top: { style: 'medium' },
+          bottom: { style: 'medium' },
+          left: { style: 'medium' },
+          right: { style: 'medium' }
+        };
+      }
+
       let workingHoursStr = '';
       try {
         const hours = typeof row.working_hours === 'string' ? JSON.parse(row.working_hours) : row.working_hours;

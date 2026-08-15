@@ -45,14 +45,23 @@ export default function AdminHome() {
       <header className="header">
         <h1>日報一覧（管理者用）</h1>
         <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-          <input 
-            type="month" 
+          <select 
             value={selectedMonth} 
             onChange={(e) => setSelectedMonth(e.target.value)}
             className="month-selector"
-            style={{ padding: '0.5rem', borderRadius: '0.375rem', border: '1px solid #ccc' }}
-          />
-          <a href={`/api/export?month=${selectedMonth}`} className="btn btn-secondary">⬇️ エクセルで保存</a>
+            style={{ padding: '0.5rem', borderRadius: '0.375rem', border: '1px solid #ccc', fontSize: '1rem' }}
+          >
+            <option value="">すべて（全期間）</option>
+            {/* 過去12ヶ月の選択肢を動的に生成 */}
+            {Array.from({ length: 12 }).map((_, i) => {
+              const d = new Date();
+              d.setMonth(d.getMonth() - i);
+              const val = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+              const label = `${d.getFullYear()}年${d.getMonth() + 1}月`;
+              return <option key={val} value={val}>{label}</option>;
+            })}
+          </select>
+          <a href={selectedMonth ? `/api/export?month=${selectedMonth}` : `/api/export`} className="btn btn-secondary">⬇️ エクセルで保存</a>
         </div>
       </header>
 
