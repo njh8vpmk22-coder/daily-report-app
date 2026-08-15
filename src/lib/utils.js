@@ -42,10 +42,9 @@ export function calculateOvertime(workingHoursArray) {
 
 export function formatOvertime(minutes) {
   if (minutes <= 0) return '';
-  const h = Math.floor(minutes / 60);
-  const m = minutes % 60;
-  if (m === 0) return `残業${h}`;
-  return `残業${h}時間${m}分`;
+  const hours = minutes / 60;
+  const formattedHours = parseFloat(hours.toFixed(2));
+  return `残業${formattedHours}`;
 }
 
 export function formatWorkingHoursText(workingHoursArray) {
