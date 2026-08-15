@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { formatWorkingHoursText } from '@/lib/utils';
 
 export default function CreateReport() {
   const router = useRouter();
@@ -59,13 +60,11 @@ export default function CreateReport() {
       });
       
       if (res.ok) {
-        // メール通知 (FormSubmit.co) をフロント側から実行する（Refererヘッダーが必要なため）
+        // メール通知 (FormSubmit.co) をフロント側から実行する
         try {
-          // 残業時間を計算してテキスト化
-          const { formatWorkingHoursText } = await import('../../lib/utils');
           const workingHoursText = formatWorkingHoursText(validWorkingHours);
 
-          await fetch('https://formsubmit.co/ajax/fugfuurgh57@yahoo.co.jp,igarasimiyagi@yahoo.co.jp', {
+          const mailRes = await fetch('https://formsubmit.co/ajax/fugfuurgh57@yahoo.co.jp,igarasimiyagi@yahoo.co.jp', {
             method: "POST",
             headers: { 
                 'Content-Type': 'application/json',
@@ -81,8 +80,13 @@ export default function CreateReport() {
                 '備考': formData.remarks || 'なし',
             })
           });
+
+          if (!mailRes.ok) {
+            console.error('Mail service error status:', mailRes.status);
+          }
         } catch (e) {
           console.error('Mail error', e);
+          alert('日報は保存されましたが、メール通知システムでエラーが発生しました: ' + e.message);
         }
         
         router.push('/');
