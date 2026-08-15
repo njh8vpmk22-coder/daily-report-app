@@ -51,6 +51,33 @@ export async function POST(request) {
       RETURNING id;
     `;
 
+    // メール通知の送信 (FormSubmit.co を使用)
+    try {
+      let workingHoursText = '';
+      if (Array.isArray(working_hours)) {
+        workingHoursText = working_hours.map(h => `${h.start}〜${h.end}`).join(', ');
+      }
+
+      await fetch('https://formsubmit.co/ajax/fugfuurgh57@yahoo.co.jp', {
+        method: "POST",
+        headers: { 
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+        },
+        body: JSON.stringify({
+            _subject: `【日報提出】${name}さんから日報が提出されました`,
+            '日付': date,
+            '氏名': name,
+            '稼働時間': workingHoursText,
+            '施工場所': location,
+            '業務内容': content,
+            '備考': remarks || 'なし',
+        })
+      });
+    } catch (emailError) {
+      console.error('メール送信エラー（日報は保存されています）:', emailError);
+    }
+
     return NextResponse.json({ id: rows[0].id, success: true }, { status: 201 });
   } catch (error) {
     console.error('Error in POST /api/reports:', error);
