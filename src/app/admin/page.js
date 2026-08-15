@@ -42,9 +42,22 @@ export default function AdminHome() {
 
   return (
     <div className="container">
-      <header className="header">
-        <h1>日報一覧（管理者用）</h1>
-        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+      <header className="header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <h1 style={{ margin: 0 }}>日報一覧（管理者用）</h1>
+        <button 
+          onClick={async () => {
+            if(confirm('ログアウトしますか？')){
+              await fetch('/api/auth/logout', { method: 'POST' });
+              window.location.href = '/login';
+            }
+          }}
+          className="btn btn-secondary"
+        >
+          ログアウト
+        </button>
+      </header>
+      
+      <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
           <select 
             value={selectedMonth} 
             onChange={(e) => setSelectedMonth(e.target.value)}
@@ -81,7 +94,6 @@ export default function AdminHome() {
             🗑️ データを全削除
           </button>
         </div>
-      </header>
 
       <main>
         {loading ? (

@@ -108,8 +108,20 @@ export default function CreateReport() {
 
   return (
     <div className="container form-container">
-      <header className="header">
+      <header className="header" style={{ display: 'flex', alignItems: 'center' }}>
         <h1>日報作成</h1>
+        <button 
+          onClick={async () => {
+            if(confirm('ログアウトしますか？')){
+              await fetch('/api/auth/logout', { method: 'POST' });
+              window.location.href = '/login';
+            }
+          }}
+          className="btn btn-secondary"
+          style={{ marginLeft: 'auto' }}
+        >
+          ログアウト
+        </button>
       </header>
 
       <main>
