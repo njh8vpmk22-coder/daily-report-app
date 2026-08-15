@@ -64,25 +64,29 @@ export default function CreateReport() {
         try {
           const workingHoursText = formatWorkingHoursText(validWorkingHours);
 
-          const mailRes = await fetch('https://formsubmit.co/ajax/fugfuurgh57@yahoo.co.jp,igarasimiyagi@yahoo.co.jp', {
-            method: "POST",
-            headers: { 
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-            },
-            body: JSON.stringify({
-                _subject: `【日報提出】${formData.name}さんから日報が提出されました`,
-                '日付': formData.date,
-                '氏名': formData.name,
-                '稼働時間': workingHoursText,
-                '施工場所': formData.location,
-                '業務内容': formData.content,
-                '備考': formData.remarks || 'なし',
-            })
-          });
+          const emails = ['fugfuurgh57@yahoo.co.jp', 'igarasimiyagi@yahoo.co.jp'];
+          
+          for (const email of emails) {
+            const mailRes = await fetch(`https://formsubmit.co/ajax/${email}`, {
+              method: "POST",
+              headers: { 
+                  'Content-Type': 'application/json',
+                  'Accept': 'application/json'
+              },
+              body: JSON.stringify({
+                  _subject: `【日報提出】${formData.name}さんから日報が提出されました`,
+                  '日付': formData.date,
+                  '氏名': formData.name,
+                  '稼働時間': workingHoursText,
+                  '施工場所': formData.location,
+                  '業務内容': formData.content,
+                  '備考': formData.remarks || 'なし',
+              })
+            });
 
-          if (!mailRes.ok) {
-            console.error('Mail service error status:', mailRes.status);
+            if (!mailRes.ok) {
+              console.error(`Mail service error for ${email}, status:`, mailRes.status);
+            }
           }
         } catch (e) {
           console.error('Mail error', e);
