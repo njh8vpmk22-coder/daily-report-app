@@ -37,7 +37,10 @@ export default function Home() {
     <div className="container">
       <header className="header">
         <h1>日報一覧</h1>
-        <Link href="/create" className="btn btn-primary">日報を作成</Link>
+        <div style={{ display: 'flex', gap: '0.5rem' }}>
+          <a href="/api/export" className="btn btn-secondary">⬇️ エクセルで保存</a>
+          <Link href="/create" className="btn btn-primary">日報を作成</Link>
+        </div>
       </header>
 
       <main>
