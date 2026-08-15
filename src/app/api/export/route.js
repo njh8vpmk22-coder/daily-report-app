@@ -2,9 +2,19 @@ import { sql } from '@vercel/postgres';
 import { NextResponse } from 'next/server';
 import ExcelJS from 'exceljs';
 
-export async function GET() {
+export async function GET(request) {
   try {
-    const { rows } = await sql`SELECT * FROM reports ORDER BY date DESC, created_at DESC;`;
+    const { searchParams } = new URL(request.url);
+    const month = searchParams.get('month');
+
+    let rows;
+    if (month) {
+      const result = await sql`SELECT * FROM reports WHERE date LIKE ${month + '%'} ORDER BY date DESC, created_at DESC;`;
+      rows = result.rows;
+    } else {
+      const result = await sql`SELECT * FROM reports ORDER BY date DESC, created_at DESC;`;
+      rows = result.rows;
+    }
 
     const { formatWorkingHoursText } = await import('@/lib/utils');
     

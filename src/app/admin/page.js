@@ -7,15 +7,21 @@ import '../globals.css';
 export default function AdminHome() {
   const [reports, setReports] = useState([]);
   const [loading, setLoading] = useState(true);
+  
+  // 今月を初期値にする (YYYY-MM)
+  const currentDate = new Date();
+  const initialMonth = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}`;
+  const [selectedMonth, setSelectedMonth] = useState(initialMonth);
 
   useEffect(() => {
-    fetch('/api/reports')
+    setLoading(true);
+    fetch(`/api/reports?month=${selectedMonth}`)
       .then((res) => res.json())
       .then((data) => {
         setReports(data);
         setLoading(false);
       });
-  }, []);
+  }, [selectedMonth]);
 
   // 稼働時間と残業時間をフォーマットして表示する関数
   const renderWorkingHours = (workingHoursStr) => {
@@ -38,8 +44,15 @@ export default function AdminHome() {
     <div className="container">
       <header className="header">
         <h1>日報一覧（管理者用）</h1>
-        <div style={{ display: 'flex', gap: '0.5rem' }}>
-          <a href="/api/export" className="btn btn-secondary">⬇️ エクセルで保存</a>
+        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+          <input 
+            type="month" 
+            value={selectedMonth} 
+            onChange={(e) => setSelectedMonth(e.target.value)}
+            className="month-selector"
+            style={{ padding: '0.5rem', borderRadius: '0.375rem', border: '1px solid #ccc' }}
+          />
+          <a href={`/api/export?month=${selectedMonth}`} className="btn btn-secondary">⬇️ エクセルで保存</a>
         </div>
       </header>
 

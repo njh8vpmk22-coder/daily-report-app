@@ -1,8 +1,11 @@
 import { sql } from '@vercel/postgres';
 import { NextResponse } from 'next/server';
 
-export async function GET() {
+export async function GET(request) {
   try {
+    const { searchParams } = new URL(request.url);
+    const month = searchParams.get('month');
+
     // テーブルが存在しない場合は作成 (初回のみ)
     await sql`
       CREATE TABLE IF NOT EXISTS reports (
@@ -21,7 +24,16 @@ export async function GET() {
       ALTER TABLE reports ADD COLUMN IF NOT EXISTS working_hours JSONB DEFAULT '[]'::jsonb;
     `;
 
-    const { rows } = await sql`SELECT * FROM reports ORDER BY date DESC, created_at DESC;`;
+    let rows;
+    if (month) {
+      // YYYY-MM形式のmonthで絞り込み
+      const result = await sql`SELECT * FROM reports WHERE date LIKE ${month + '%'} ORDER BY date DESC, created_at DESC;`;
+      rows = result.rows;
+    } else {
+      const result = await sql`SELECT * FROM reports ORDER BY date DESC, created_at DESC;`;
+      rows = result.rows;
+    }
+    
     return NextResponse.json(rows);
   } catch (error) {
     console.error('Error in GET /api/reports:', error);
