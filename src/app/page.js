@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { formatWorkingHoursText } from '@/lib/utils';
 import './globals.css';
 
 export default function Home() {
@@ -16,18 +17,18 @@ export default function Home() {
       });
   }, []);
 
-  // 稼働時間をフォーマットして表示する関数
+  // 稼働時間と残業時間をフォーマットして表示する関数
   const renderWorkingHours = (workingHoursStr) => {
     if (!workingHoursStr) return '記録なし';
     try {
       const hours = typeof workingHoursStr === 'string' ? JSON.parse(workingHoursStr) : workingHoursStr;
       if (!Array.isArray(hours) || hours.length === 0) return '記録なし';
       
-      return hours.map((h, i) => (
-        <span key={i} className="working-hour-badge">
-          {h.start}〜{h.end}
+      return (
+        <span className="working-hour-badge">
+          {formatWorkingHoursText(hours)}
         </span>
-      ));
+      );
     } catch (e) {
       return '記録なし';
     }

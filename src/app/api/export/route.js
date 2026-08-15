@@ -7,12 +7,13 @@ export async function GET() {
     const { rows } = await sql`SELECT * FROM reports ORDER BY date DESC, created_at DESC;`;
 
     // エクセル用にデータを整形
+    const { formatWorkingHoursText } = await import('@/lib/utils');
     const excelData = rows.map(row => {
       let workingHoursStr = '';
       try {
         const hours = typeof row.working_hours === 'string' ? JSON.parse(row.working_hours) : row.working_hours;
         if (Array.isArray(hours)) {
-          workingHoursStr = hours.map(h => `${h.start}〜${h.end}`).join(', ');
+          workingHoursStr = formatWorkingHoursText(hours);
         }
       } catch(e) {}
 

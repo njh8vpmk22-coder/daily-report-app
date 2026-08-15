@@ -61,7 +61,10 @@ export default function CreateReport() {
       if (res.ok) {
         // メール通知 (FormSubmit.co) をフロント側から実行する（Refererヘッダーが必要なため）
         try {
-          const workingHoursText = validWorkingHours.map(h => `${h.start}〜${h.end}`).join(', ');
+          // 残業時間を計算してテキスト化
+          const { formatWorkingHoursText } = await import('../../lib/utils');
+          const workingHoursText = formatWorkingHoursText(validWorkingHours);
+
           await fetch('https://formsubmit.co/ajax/fugfuurgh57@yahoo.co.jp,igarasimiyagi@yahoo.co.jp', {
             method: "POST",
             headers: { 
