@@ -16,6 +16,11 @@ export async function GET() {
       );
     `;
 
+    // 稼働時間のカラムを追加（すでに存在する場合は無視される）
+    await sql`
+      ALTER TABLE reports ADD COLUMN IF NOT EXISTS working_hours JSONB DEFAULT '[]'::jsonb;
+    `;
+
     const { rows } = await sql`SELECT * FROM reports ORDER BY date DESC, created_at DESC;`;
     return NextResponse.json(rows);
   } catch (error) {
@@ -27,15 +32,22 @@ export async function GET() {
 export async function POST(request) {
   try {
     const body = await request.json();
-    const { date, name, location, content, remarks } = body;
+    const { date, name, location, content, remarks, working_hours } = body;
 
     if (!date || !name || !location || !content) {
       return NextResponse.json({ error: '必須項目が不足しています。' }, { status: 400 });
     }
 
+    // 稼働時間のカラムを追加（念のためここでも実行）
+    await sql`
+      ALTER TABLE reports ADD COLUMN IF NOT EXISTS working_hours JSONB DEFAULT '[]'::jsonb;
+    `;
+
+    const workingHoursJson = working_hours ? JSON.stringify(working_hours) : '[]';
+
     const { rows } = await sql`
-      INSERT INTO reports (date, name, location, content, remarks)
-      VALUES (${date}, ${name}, ${location}, ${content}, ${remarks})
+      INSERT INTO reports (date, name, location, content, remarks, working_hours)
+      VALUES (${date}, ${name}, ${location}, ${content}, ${remarks}, ${workingHoursJson})
       RETURNING id;
     `;
 

@@ -16,6 +16,23 @@ export default function Home() {
       });
   }, []);
 
+  // 稼働時間をフォーマットして表示する関数
+  const renderWorkingHours = (workingHoursStr) => {
+    if (!workingHoursStr) return '記録なし';
+    try {
+      const hours = typeof workingHoursStr === 'string' ? JSON.parse(workingHoursStr) : workingHoursStr;
+      if (!Array.isArray(hours) || hours.length === 0) return '記録なし';
+      
+      return hours.map((h, i) => (
+        <span key={i} className="working-hour-badge">
+          {h.start}〜{h.end}
+        </span>
+      ));
+    } catch (e) {
+      return '記録なし';
+    }
+  };
+
   return (
     <div className="container">
       <header className="header">
@@ -38,6 +55,9 @@ export default function Home() {
                 </div>
                 <div className="report-body">
                   <p><strong>📍 施工場所:</strong> {report.location}</p>
+                  <p className="working-hours-display">
+                    <strong>⏱️ 稼働時間:</strong> {renderWorkingHours(report.working_hours)}
+                  </p>
                   <p><strong>📝 業務内容:</strong></p>
                   <pre className="report-content">{report.content}</pre>
                   {report.remarks && (

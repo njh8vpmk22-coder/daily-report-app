@@ -5,6 +5,7 @@ import Link from 'next/link';
 
 export default function CreateReport() {
   const router = useRouter();
+  
   const [formData, setFormData] = useState({
     date: new Date().toLocaleDateString('ja-JP').replace(/\//g, '-').split('-').map(p => p.padStart(2, '0')).join('-'), // YYYY-MM-DD
     name: '',
@@ -12,6 +13,11 @@ export default function CreateReport() {
     content: '',
     remarks: ''
   });
+
+  const [workingHours, setWorkingHours] = useState([
+    { start: '09:00', end: '17:00' }
+  ]);
+
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleChange = (e) => {
@@ -19,15 +25,39 @@ export default function CreateReport() {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  const handleWorkingHourChange = (index, field, value) => {
+    const newWorkingHours = [...workingHours];
+    newWorkingHours[index][field] = value;
+    setWorkingHours(newWorkingHours);
+  };
+
+  const addWorkingHour = () => {
+    setWorkingHours([...workingHours, { start: '', end: '' }]);
+  };
+
+  const removeWorkingHour = (index) => {
+    const newWorkingHours = [...workingHours];
+    newWorkingHours.splice(index, 1);
+    setWorkingHours(newWorkingHours);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSubmitting(true);
+    
+    // 空の時間エントリを除外
+    const validWorkingHours = workingHours.filter(h => h.start && h.end);
+
     try {
       const res = await fetch('/api/reports', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
+        body: JSON.stringify({
+          ...formData,
+          working_hours: validWorkingHours
+        }),
       });
+      
       if (res.ok) {
         router.push('/');
         router.refresh();
@@ -59,6 +89,46 @@ export default function CreateReport() {
           <div className="form-group">
             <label htmlFor="name">氏名 <span className="required">*</span></label>
             <input type="text" id="name" name="name" value={formData.name} onChange={handleChange} required placeholder="例: 山田太郎" />
+          </div>
+
+          <div className="form-group">
+            <label>稼働時間 <span className="required">*</span></label>
+            <div className="working-hours-container">
+              {workingHours.map((wh, index) => (
+                <div key={index} className="working-hour-row">
+                  <input 
+                    type="time" 
+                    value={wh.start} 
+                    onChange={(e) => handleWorkingHourChange(index, 'start', e.target.value)}
+                    required
+                  />
+                  <span>〜</span>
+                  <input 
+                    type="time" 
+                    value={wh.end} 
+                    onChange={(e) => handleWorkingHourChange(index, 'end', e.target.value)}
+                    required
+                  />
+                  {workingHours.length > 1 && (
+                    <button 
+                      type="button" 
+                      onClick={() => removeWorkingHour(index)}
+                      className="btn-icon delete-btn"
+                      title="削除"
+                    >
+                      ×
+                    </button>
+                  )}
+                </div>
+              ))}
+              <button 
+                type="button" 
+                onClick={addWorkingHour} 
+                className="btn btn-secondary add-time-btn"
+              >
+                ＋ 稼働時間を追加
+              </button>
+            </div>
           </div>
 
           <div className="form-group">
