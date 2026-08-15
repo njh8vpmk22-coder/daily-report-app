@@ -62,6 +62,24 @@ export default function AdminHome() {
             })}
           </select>
           <a href={selectedMonth ? `/api/export?month=${selectedMonth}` : `/api/export`} className="btn btn-secondary">⬇️ エクセルで保存</a>
+          
+          <button 
+            onClick={async () => {
+              if (confirm('【警告】本当にすべてのデータを削除しますか？\n（エクセルをダウンロードし忘れていないか確認してください）\n※この操作は取り消せません。')) {
+                const res = await fetch('/api/reports', { method: 'DELETE' });
+                if (res.ok) {
+                  alert('すべてのデータを削除しました。');
+                  window.location.reload();
+                } else {
+                  alert('削除中にエラーが発生しました。');
+                }
+              }
+            }}
+            className="btn"
+            style={{ background: '#ef4444', color: 'white', marginLeft: 'auto' }}
+          >
+            🗑️ データを全削除
+          </button>
         </div>
       </header>
 

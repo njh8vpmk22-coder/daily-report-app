@@ -69,3 +69,14 @@ export async function POST(request) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
+
+export async function DELETE() {
+  try {
+    // テーブルの中身をすべて空にし、IDを1からリセットする
+    await sql`TRUNCATE TABLE reports RESTART IDENTITY;`;
+    return NextResponse.json({ success: true });
+  } catch (error) {
+    console.error('Error in DELETE /api/reports:', error);
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
+}
