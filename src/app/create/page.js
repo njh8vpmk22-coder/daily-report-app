@@ -94,7 +94,8 @@ export default function CreateReport() {
         }
         
         alert('日報の送信が完了しました！お疲れ様でした。');
-        window.location.reload(); // フォームをリセットする
+        await fetch('/api/auth/logout', { method: 'POST' });
+        window.location.href = '/login';
       } else {
         const errorData = await res.json();
         alert('エラーが発生しました: ' + errorData.error);
