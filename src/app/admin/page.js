@@ -12,16 +12,21 @@ export default function AdminHome() {
   const currentDate = new Date();
   const initialMonth = `${currentDate.getFullYear()}-${String(currentDate.getMonth() + 1).padStart(2, '0')}`;
   const [selectedMonth, setSelectedMonth] = useState(initialMonth);
+  const [selectedName, setSelectedName] = useState('');
 
   useEffect(() => {
     setLoading(true);
-    fetch(`/api/reports?month=${selectedMonth}`)
+    let url = `/api/reports?month=${selectedMonth}`;
+    if (selectedName) {
+      url += `&name=${encodeURIComponent(selectedName)}`;
+    }
+    fetch(url)
       .then((res) => res.json())
       .then((data) => {
         setReports(data);
         setLoading(false);
       });
-  }, [selectedMonth]);
+  }, [selectedMonth, selectedName]);
 
   // 稼働時間と残業時間をフォーマットして表示する関数
   const renderWorkingHours = (workingHoursStr) => {
@@ -74,7 +79,25 @@ export default function AdminHome() {
               return <option key={val} value={val}>{label}</option>;
             })}
           </select>
-          <a href={selectedMonth ? `/api/export?month=${selectedMonth}` : `/api/export`} className="btn btn-secondary">⬇️ エクセルで保存</a>
+
+          <select 
+            value={selectedName} 
+            onChange={(e) => setSelectedName(e.target.value)}
+            className="month-selector"
+            style={{ padding: '0.5rem', borderRadius: '0.375rem', border: '1px solid #ccc', fontSize: '1rem' }}
+          >
+            <option value="">すべて（全員）</option>
+            <option value="イガラシ　ルイ">イガラシ　ルイ</option>
+            <option value="ナカヤマ　タクミ">ナカヤマ　タクミ</option>
+            <option value="ナカノ　シンジ">ナカノ　シンジ</option>
+          </select>
+
+          <a 
+            href={`/api/export?month=${selectedMonth}&name=${encodeURIComponent(selectedName)}`} 
+            className="btn btn-secondary"
+          >
+            ⬇️ エクセルで保存
+          </a>
         </div>
 
       <main>

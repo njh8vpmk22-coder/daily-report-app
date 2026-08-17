@@ -5,6 +5,7 @@ export async function GET(request) {
   try {
     const { searchParams } = new URL(request.url);
     const month = searchParams.get('month');
+    const name = searchParams.get('name');
 
     // テーブルが存在しない場合は作成 (初回のみ)
     await sql`
@@ -25,9 +26,14 @@ export async function GET(request) {
     `;
 
     let rows;
-    if (month) {
-      // YYYY-MM形式のmonthで絞り込み
+    if (month && name) {
+      const result = await sql`SELECT * FROM reports WHERE date LIKE ${month + '%'} AND name = ${name} ORDER BY date DESC, created_at DESC;`;
+      rows = result.rows;
+    } else if (month) {
       const result = await sql`SELECT * FROM reports WHERE date LIKE ${month + '%'} ORDER BY date DESC, created_at DESC;`;
+      rows = result.rows;
+    } else if (name) {
+      const result = await sql`SELECT * FROM reports WHERE name = ${name} ORDER BY date DESC, created_at DESC;`;
       rows = result.rows;
     } else {
       const result = await sql`SELECT * FROM reports ORDER BY date DESC, created_at DESC;`;
