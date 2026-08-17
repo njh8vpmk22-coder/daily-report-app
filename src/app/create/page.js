@@ -1,5 +1,5 @@
 "use client";
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { formatWorkingHoursText } from '@/lib/utils';
@@ -20,6 +20,26 @@ export default function CreateReport() {
   ]);
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // ページ読み込み時にCookieから名前を取得
+  useEffect(() => {
+    const getCookieValue = (name) => {
+      const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+      if (match) {
+        try {
+          return decodeURIComponent(match[2]);
+        } catch (e) {
+          return '';
+        }
+      }
+      return '';
+    };
+
+    const userName = getCookieValue('user_name');
+    if (userName) {
+      setFormData(prev => ({ ...prev, name: userName }));
+    }
+  }, []);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -134,7 +154,15 @@ export default function CreateReport() {
 
           <div className="form-group">
             <label htmlFor="name">氏名 <span className="required">*</span></label>
-            <input type="text" id="name" name="name" value={formData.name} onChange={handleChange} required placeholder="例: 山田太郎" />
+            <input 
+              type="text" 
+              id="name" 
+              name="name" 
+              value={formData.name} 
+              readOnly 
+              required 
+              style={{ backgroundColor: '#f3f4f6', color: '#4b5563', cursor: 'not-allowed', width: '100%', padding: '0.75rem', borderRadius: '0.375rem', border: '1px solid #d1d5db' }} 
+            />
           </div>
 
           <div className="form-group">

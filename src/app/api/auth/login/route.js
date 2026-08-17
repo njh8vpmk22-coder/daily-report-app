@@ -11,9 +11,18 @@ export async function POST(req) {
       res.cookies.set('auth_token', 'admin', { path: '/', maxAge: 60 * 60 * 24 * 30, httpOnly: true });
       return res;
     } 
-    // 作業員用パスワード
-    else if (password === '1200') {
+    
+    // 作業員用パスワード（個人別）
+    const users = {
+      '1201': 'イガラシ　ルイ',
+      '1202': 'ナカヤマ　タクミ',
+      '1203': 'ナカノ　シンジ'
+    };
+
+    if (users[password]) {
       res.cookies.set('auth_token', 'worker', { path: '/', maxAge: 60 * 60 * 24 * 30, httpOnly: true });
+      // クライアント側（ブラウザ）で読み取れるように httpOnly を false にする
+      res.cookies.set('user_name', encodeURIComponent(users[password]), { path: '/', maxAge: 60 * 60 * 24 * 30, httpOnly: false });
       return res;
     }
 

@@ -57,13 +57,33 @@ export async function POST(request) {
 
     const workingHoursJson = working_hours ? JSON.stringify(working_hours) : '[]';
 
-    const { rows } = await sql`
-      INSERT INTO reports (date, name, location, content, remarks, working_hours)
-      VALUES (${date}, ${name}, ${location}, ${content}, ${remarks}, ${workingHoursJson})
-      RETURNING id;
-    `;
+    // 同日・同名の日報が既に存在するかチェック
+    const existing = await sql`SELECT id FROM reports WHERE date = ${date} AND name = ${name} LIMIT 1`;
 
-    return NextResponse.json({ id: rows[0].id, success: true }, { status: 201 });
+    let reportId;
+    if (existing.rows.length > 0) {
+      // 存在する場合は上書き（UPDATE）
+      reportId = existing.rows[0].id;
+      await sql`
+        UPDATE reports 
+        SET location = ${location}, 
+            content = ${content}, 
+            remarks = ${remarks}, 
+            working_hours = ${workingHoursJson}, 
+            created_at = CURRENT_TIMESTAMP
+        WHERE id = ${reportId}
+      `;
+    } else {
+      // 存在しない場合は新規作成（INSERT）
+      const { rows } = await sql`
+        INSERT INTO reports (date, name, location, content, remarks, working_hours)
+        VALUES (${date}, ${name}, ${location}, ${content}, ${remarks}, ${workingHoursJson})
+        RETURNING id;
+      `;
+      reportId = rows[0].id;
+    }
+
+    return NextResponse.json({ id: reportId, success: true }, { status: 201 });
   } catch (error) {
     console.error('Error in POST /api/reports:', error);
     return NextResponse.json({ error: error.message }, { status: 500 });
