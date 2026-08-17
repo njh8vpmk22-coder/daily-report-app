@@ -27,7 +27,12 @@ export default function CreateReport() {
       const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
       if (match) {
         try {
-          return decodeURIComponent(match[2]);
+          let val = match[2];
+          // Vercel/Next.jsの仕様で二重にエンコードされることがあるため、完全にデコードされるまで繰り返す
+          while (val.includes('%25')) {
+            val = decodeURIComponent(val);
+          }
+          return decodeURIComponent(val);
         } catch (e) {
           return '';
         }
