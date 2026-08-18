@@ -24,7 +24,23 @@ export function calculateOvertime(workingHoursArray) {
       endMin += 24 * 60; // 日またぎ対応
     }
 
-    totalWorked += (endMin - startMin);
+    let worked = endMin - startMin;
+
+    // 昼休憩（12:00〜13:00）アリの場合は、その時間を滞在時間からマイナスする
+    const isLunchBreak = wh.hasLunch !== false; // 明示的にfalseでなければアリとみなす
+
+    if (isLunchBreak) {
+      const lunchStart = timeToMinutes('12:00');
+      const lunchEnd = timeToMinutes('13:00');
+      const lunchOverlapStart = Math.max(startMin, lunchStart);
+      const lunchOverlapEnd = Math.min(endMin, lunchEnd);
+      
+      if (lunchOverlapEnd > lunchOverlapStart) {
+        worked -= (lunchOverlapEnd - lunchOverlapStart);
+      }
+    }
+
+    totalWorked += worked;
 
     for (const period of normalPeriods) {
       const overlapStart = Math.max(startMin, period.start);
@@ -50,7 +66,13 @@ export function formatOvertime(minutes) {
 export function formatWorkingHoursText(workingHoursArray) {
   if (!Array.isArray(workingHoursArray)) return '';
   
-  const hoursText = workingHoursArray.map(h => `${h.start}〜${h.end}`).join('、');
+  const hoursText = workingHoursArray.map(h => {
+    let text = `${h.start}〜${h.end}`;
+    if (h.hasLunch !== undefined) {
+      text += ` (昼休憩: ${h.hasLunch ? 'アリ' : 'ナシ'})`;
+    }
+    return text;
+  }).join('、');
   const otMin = calculateOvertime(workingHoursArray);
   const otText = formatOvertime(otMin);
   

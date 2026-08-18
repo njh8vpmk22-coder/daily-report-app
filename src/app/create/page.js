@@ -68,20 +68,10 @@ export default function CreateReport() {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleWorkingHourChange = (index, field, value) => {
-    const newWorkingHours = [...workingHours];
-    newWorkingHours[index][field] = value;
-    setWorkingHours(newWorkingHours);
-  };
+  const [workingHour, setWorkingHour] = useState({ start: '', end: '', hasLunch: true });
 
-  const addWorkingHour = () => {
-    setWorkingHours([...workingHours, { start: '', end: '' }]);
-  };
-
-  const removeWorkingHour = (index) => {
-    const newWorkingHours = [...workingHours];
-    newWorkingHours.splice(index, 1);
-    setWorkingHours(newWorkingHours);
+  const handleWorkingHourChange = (field, value) => {
+    setWorkingHour(prev => ({ ...prev, [field]: value }));
   };
 
   const handleSubmit = async (e) => {
@@ -89,7 +79,7 @@ export default function CreateReport() {
     setIsSubmitting(true);
     
     // 空の時間エントリを除外
-    const validWorkingHours = workingHours.filter(h => h.start && h.end);
+    const validWorkingHours = (workingHour.start && workingHour.end) ? [workingHour] : [];
 
     try {
       const res = await fetch('/api/reports', {
@@ -189,41 +179,43 @@ export default function CreateReport() {
 
           <div className="form-group">
             <label>稼働時間 <span className="required">*</span></label>
-            <div className="working-hours-container">
-              {workingHours.map((wh, index) => (
-                <div key={index} className="working-hour-row">
+            <div className="working-hours-container" style={{ display: 'flex', flexDirection: 'column', gap: '1rem', backgroundColor: '#f9fafb', padding: '1rem', borderRadius: '0.375rem', border: '1px solid #e5e7eb' }}>
+              <div className="working-hour-row" style={{ justifyContent: 'flex-start' }}>
+                <input 
+                  type="time" 
+                  value={workingHour.start} 
+                  onChange={(e) => handleWorkingHourChange('start', e.target.value)}
+                  required
+                />
+                <span>〜</span>
+                <input 
+                  type="time" 
+                  value={workingHour.end} 
+                  onChange={(e) => handleWorkingHourChange('end', e.target.value)}
+                  required
+                />
+              </div>
+              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', fontSize: '0.95rem' }}>
+                <span style={{ fontWeight: 'bold', color: '#4b5563' }}>昼休憩 (12:00〜13:00):</span>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', cursor: 'pointer' }}>
                   <input 
-                    type="time" 
-                    value={wh.start} 
-                    onChange={(e) => handleWorkingHourChange(index, 'start', e.target.value)}
-                    required
+                    type="radio" 
+                    name="hasLunch" 
+                    checked={workingHour.hasLunch === true}
+                    onChange={() => handleWorkingHourChange('hasLunch', true)}
                   />
-                  <span>〜</span>
+                  アリ
+                </label>
+                <label style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', cursor: 'pointer' }}>
                   <input 
-                    type="time" 
-                    value={wh.end} 
-                    onChange={(e) => handleWorkingHourChange(index, 'end', e.target.value)}
-                    required
+                    type="radio" 
+                    name="hasLunch" 
+                    checked={workingHour.hasLunch === false}
+                    onChange={() => handleWorkingHourChange('hasLunch', false)}
                   />
-                  {workingHours.length > 1 && (
-                    <button 
-                      type="button" 
-                      onClick={() => removeWorkingHour(index)}
-                      className="btn-icon delete-btn"
-                      title="削除"
-                    >
-                      ×
-                    </button>
-                  )}
-                </div>
-              ))}
-              <button 
-                type="button" 
-                onClick={addWorkingHour} 
-                className="btn btn-secondary add-time-btn"
-              >
-                ＋ 稼働時間を追加
-              </button>
+                  ナシ
+                </label>
+              </div>
             </div>
           </div>
 
