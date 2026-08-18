@@ -195,26 +195,48 @@ export default function CreateReport() {
                   required
                 />
               </div>
-              <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', fontSize: '0.95rem' }}>
-                <span style={{ fontWeight: 'bold', color: '#4b5563' }}>昼休憩 (12:00〜13:00):</span>
-                <label style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', cursor: 'pointer' }}>
-                  <input 
-                    type="radio" 
-                    name="hasLunch" 
-                    checked={workingHour.hasLunch === true}
-                    onChange={() => handleWorkingHourChange('hasLunch', true)}
-                  />
-                  アリ
-                </label>
-                <label style={{ display: 'flex', alignItems: 'center', gap: '0.25rem', cursor: 'pointer' }}>
-                  <input 
-                    type="radio" 
-                    name="hasLunch" 
-                    checked={workingHour.hasLunch === false}
-                    onChange={() => handleWorkingHourChange('hasLunch', false)}
-                  />
-                  ナシ
-                </label>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', marginTop: '0.5rem' }}>
+                <span style={{ fontWeight: 'bold', color: '#4b5563', fontSize: '0.9rem' }}>昼休憩 (12:00〜13:00)</span>
+                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                  <button
+                    type="button"
+                    onClick={() => handleWorkingHourChange('hasLunch', true)}
+                    style={{
+                      flex: 1,
+                      padding: '0.75rem',
+                      borderRadius: '0.5rem',
+                      border: workingHour.hasLunch === true ? '2px solid #3b82f6' : '1px solid #d1d5db',
+                      backgroundColor: workingHour.hasLunch === true ? '#eff6ff' : '#ffffff',
+                      color: workingHour.hasLunch === true ? '#1d4ed8' : '#4b5563',
+                      fontWeight: 'bold',
+                      fontSize: '1rem',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease',
+                      boxShadow: workingHour.hasLunch === true ? '0 1px 2px rgba(59, 130, 246, 0.2)' : 'none'
+                    }}
+                  >
+                    ☕️ アリ
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleWorkingHourChange('hasLunch', false)}
+                    style={{
+                      flex: 1,
+                      padding: '0.75rem',
+                      borderRadius: '0.5rem',
+                      border: workingHour.hasLunch === false ? '2px solid #ef4444' : '1px solid #d1d5db',
+                      backgroundColor: workingHour.hasLunch === false ? '#fef2f2' : '#ffffff',
+                      color: workingHour.hasLunch === false ? '#b91c1c' : '#4b5563',
+                      fontWeight: 'bold',
+                      fontSize: '1rem',
+                      cursor: 'pointer',
+                      transition: 'all 0.2s ease',
+                      boxShadow: workingHour.hasLunch === false ? '0 1px 2px rgba(239, 68, 68, 0.2)' : 'none'
+                    }}
+                  >
+                    💪 ナシ
+                  </button>
+                </div>
               </div>
             </div>
           </div>
