@@ -49,17 +49,32 @@ export default function AdminHome() {
     <div className="container">
       <header className="header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <h1 style={{ margin: 0 }}>日報一覧（管理者用）</h1>
-        <button 
-          onClick={async () => {
-            if(confirm('ログアウトしますか？')){
-              await fetch('/api/auth/logout', { method: 'POST' });
-              window.location.href = '/login';
-            }
-          }}
-          className="btn btn-secondary"
-        >
-          ログアウト
-        </button>
+        <div>
+          <button 
+            onClick={async () => {
+              if(confirm('【警告】すべてのデータを初期化します。よろしいですか？\n※この操作は元に戻せません')){
+                await fetch('/api/reset-db');
+                alert('データを初期化しました。');
+                window.location.reload();
+              }
+            }}
+            className="btn btn-secondary"
+            style={{ backgroundColor: '#ef4444', color: 'white', border: 'none', marginRight: '1rem' }}
+          >
+            ⚠️ データ初期化 (1回のみ)
+          </button>
+          <button 
+            onClick={async () => {
+              if(confirm('ログアウトしますか？')){
+                await fetch('/api/auth/logout', { method: 'POST' });
+                window.location.href = '/login';
+              }
+            }}
+            className="btn btn-secondary"
+          >
+            ログアウト
+          </button>
+        </div>
       </header>
       
       <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap' }}>
