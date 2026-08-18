@@ -68,7 +68,7 @@ export default function CreateReport() {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
-  const [workingHour, setWorkingHour] = useState({ start: '', end: '', hasLunch: true });
+  const [workingHour, setWorkingHour] = useState({ start: '07:00', end: '17:00', hasLunch: true });
 
   const handleWorkingHourChange = (field, value) => {
     setWorkingHour(prev => ({ ...prev, [field]: value }));
