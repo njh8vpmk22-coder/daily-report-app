@@ -46,6 +46,23 @@ export default function CreateReport() {
     }
   }, []);
 
+  const [stats, setStats] = useState(null);
+
+  // 名前か日付が変更されたら集計データを取得する
+  useEffect(() => {
+    if (formData.name && formData.date) {
+      const month = formData.date.substring(0, 7); // YYYY-MM
+      fetch(`/api/stats?name=${encodeURIComponent(formData.name)}&month=${month}&excludeDate=${formData.date}`)
+        .then(res => res.json())
+        .then(data => {
+          if (!data.error) {
+            setStats(data);
+          }
+        })
+        .catch(() => {});
+    }
+  }, [formData.name, formData.date]);
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData(prev => ({ ...prev, [name]: value }));
@@ -228,6 +245,18 @@ export default function CreateReport() {
           <button type="submit" className="btn btn-primary submit-btn" disabled={isSubmitting}>
             {isSubmitting ? '送信中...' : '送信する'}
           </button>
+
+          {stats && (
+            <div style={{ marginTop: '2rem', padding: '1.5rem', backgroundColor: '#f0fdf4', border: '1px solid #bbf7d0', borderRadius: '0.5rem' }}>
+              <h3 style={{ margin: '0 0 1rem 0', color: '#166534', fontSize: '1.1rem' }}>
+                📊 【あなたの今月の稼働状況（入力日を除く）】
+              </h3>
+              <ul style={{ listStyle: 'none', padding: 0, margin: 0, color: '#15803d', fontSize: '1.05rem', lineHeight: '1.6' }}>
+                <li><strong>出勤日数：</strong> {stats.totalDays} 日</li>
+                <li><strong>残業時間計：</strong> {stats.totalOvertimeHours > 0 ? `${stats.totalOvertimeHours} 時間` : '0 時間'}</li>
+              </ul>
+            </div>
+          )}
         </form>
       </main>
     </div>
