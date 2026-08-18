@@ -215,7 +215,7 @@ export default function CreateReport() {
                       boxShadow: workingHour.hasLunch === true ? '0 1px 2px rgba(59, 130, 246, 0.2)' : 'none'
                     }}
                   >
-                    ☕️ アリ
+                    有り
                   </button>
                   <button
                     type="button"
@@ -234,7 +234,7 @@ export default function CreateReport() {
                       boxShadow: workingHour.hasLunch === false ? '0 1px 2px rgba(239, 68, 68, 0.2)' : 'none'
                     }}
                   >
-                    💪 ナシ
+                    無し
                   </button>
                 </div>
               </div>
